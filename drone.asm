@@ -31,6 +31,8 @@ _start:
 	int 21h
 	mov dx,guide3
 	int 21h
+	mov dx,guide4
+	int 21h
 	mov dx,prompt
 	int 21h
 
@@ -44,6 +46,8 @@ input:
 	jz yellow
 	cmp al,'d'
 	jz red
+	cmp al,'e'
+	jz broken_oc
 	cmp al,27
 	jz prog_end
 	
@@ -69,7 +73,11 @@ func_call:
 
 	mov al,[color]
 	call changeColor
+	jmp start_anim
+broken_oc:
+	call changeColor2
 
+start_anim:
 	call drawEyes
 	call drawBrow
 	
@@ -158,6 +166,24 @@ prog_end:
 
 ;FUNCTIONS:------------------------------------------------------------------------------
 ;FUNCTION:ChangeColor
+
+changeColor2:
+	pusha
+	mov di,1
+	mov al,BRIGHT_YELLOW
+.fill:
+	stosb
+	inc di
+	cmp di,(START_Y+EYE_SIZE)*160
+	jl .fill
+	mov al,MAGENTA
+.fill2:
+	stosb
+	inc di
+	cmp di,1
+	jnz .fill2
+	popa
+	ret
 changeColor:	;AL = Color
 	pusha
 	mov di,1
@@ -294,6 +320,7 @@ drawBrow:
 guide1 db "u-Uzi",10,13,"$"
 guide2 db "n-N/V/J/Cyn...",10,13,"$"
 guide3 db "d-Doll",10,13,"$"
+guide4 db "e-End-game Uzi","$"
 prompt db "Enter color:","$"
 xPos db START_X
 yPos db START_Y
